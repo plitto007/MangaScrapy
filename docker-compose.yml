@@ -1,0 +1,12 @@
+version: "3"
+services:
+  crawler:
+    image: manga-scrap/crawler:1.0.0
+    build: ./crawler
+    hostname: crawler
+    env_file: docker-env/crawler.env
+    ports:
+      - 6800:6800
+    volumes:
+      - ./crawler/:/build/
+    command: scrapyd
