@@ -17,7 +17,13 @@ class NetTruyenSpider(scrapy.Spider):
 
     def start_requests(self):
         url = 'https://www.nettruyenup.com/truyen-tranh/imawa-no-kuni-no-alice-70987'
-        yield scrapy.Request(url, callback=self.parse, headers=headers)
+        yield scrapy.Request(url, callback=self.parse, headers=headers, meta={
+            'handle_httpstatus_list': [403, 503]
+        })
 
     def parse(self, response, **kwargs):
         self.logger.info("Starting parse Manga home page")
+        self.logger.info("status code: {}".format(response.status))
+        f = open("response.html", "w")
+        f.write(response.text)
+        f.close()

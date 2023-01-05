@@ -53,7 +53,7 @@ ROBOTSTXT_OBEY = True
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 DOWNLOADER_MIDDLEWARES = {
     # 'manga_scrap.middlewares.MangaScrapDownloaderMiddleware': 543,
-    'scrapy_cloudflare_middleware.middlewares.CloudFlareMiddleware': 560
+    'manga_scrap.middlewares.CloudFlareMiddleware': 560
 }
 
 # Enable or disable extensions

@@ -7,6 +7,9 @@ from scrapy import signals
 
 # useful for handling different item types with a single interface
 from itemadapter import is_item, ItemAdapter
+from cfscrape import get_tokens
+
+import logging
 
 
 class MangaScrapSpiderMiddleware:
@@ -101,3 +104,44 @@ class MangaScrapDownloaderMiddleware:
 
     def spider_opened(self, spider):
         spider.logger.info('Spider opened: %s' % spider.name)
+
+
+class CloudFlareMiddleware:
+    """Scrapy middleware to bypass the CloudFlare's anti-bot protection"""
+
+    @staticmethod
+    def is_cloudflare_challenge(response):
+        """Test if the given response contains the cloudflare's anti-bot protection"""
+
+        return (
+                (response.status == 503 or response.status == 403)
+                and response.headers.get('Server', '').startswith(b'cloudflare')
+                and 'jschl_vc' in response.text
+                and 'jschl_answer' in response.text
+        )
+
+    def process_response(self, request, response, spider):
+        """Handle the a Scrapy response"""
+        spider.logger.info("Process response with CloudFlareMiddleware for status code: {}".format(response.status))
+        if not self.is_cloudflare_challenge(response):
+            return response
+
+        spider.logger.info(
+            'Cloudflare protection detected on %s, trying to bypass...',
+            response.url
+        )
+
+        cloudflare_tokens, __ = get_tokens(
+            request.url,
+            user_agent=spider.settings.get('USER_AGENT')
+        )
+
+        spider.logger.debug(
+            'Successfully bypassed the protection for %s, re-scheduling the request',
+            response.url
+        )
+
+        request.cookies.update(cloudflare_tokens)
+        request.priority = 99999
+
+        return request
