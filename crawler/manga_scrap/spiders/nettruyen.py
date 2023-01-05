@@ -1,5 +1,12 @@
 # Created by [PL]_itto at 4:51 PM 12/29/22
 import scrapy
+import requests
+
+headers = {
+    "accept-language": "en-GB,en-US;q=0.9,en;q=0.8",
+    "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36",
+    "authority": "www.nettruyenup.com"
+}
 
 
 class NetTruyenSpider(scrapy.Spider):
@@ -9,7 +16,8 @@ class NetTruyenSpider(scrapy.Spider):
         super().__init__(**kwargs)
 
     def start_requests(self):
-        pass
+        url = 'https://www.nettruyenup.com/truyen-tranh/imawa-no-kuni-no-alice-70987'
+        yield scrapy.Request(url, callback=self.parse, headers=headers)
 
     def parse(self, response, **kwargs):
-        pass
+        self.logger.info("Starting parse Manga home page")
