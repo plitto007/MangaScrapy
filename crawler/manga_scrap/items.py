@@ -8,5 +8,8 @@ import scrapy
 
 class MangaScrapItem(scrapy.Item):
     # define the fields for your item here like:
-    # name = scrapy.Field()
+    name = scrapy.Field()
+    referer = scrapy.Field()
+    image_urls = scrapy.Field()
+    images = scrapy.Field()
     pass

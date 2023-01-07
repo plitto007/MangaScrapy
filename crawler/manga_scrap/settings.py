@@ -67,6 +67,7 @@ DOWNLOADER_MIDDLEWARES = {
 # ITEM_PIPELINES = {
 #    'manga_scrap.pipelines.MangaScrapPipeline': 300,
 # }
+ITEM_PIPELINES = {'manga_scrap.pipelines.NetTruyenImagesPipeline': 1}
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://docs.scrapy.org/en/latest/topics/autothrottle.html
