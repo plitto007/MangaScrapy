@@ -16,19 +16,23 @@ class NetTruyenSpider(scrapy.Spider):
         super().__init__(**kwargs)
 
     def start_requests(self):
-        url = "https://www.nettruyenup.com/truyen-tranh/imawa-no-kuni-no-alice"
-        chapter_data = open_selenium(url)
-        for chapter in chapter_data:
-            item = MangaScrapItem()
-            item['image_urls'] = chapter.get("image_urls")
-            item['name'] = chapter.get("name")
-            item['referer'] = url
-            yield item
+        yield scrapy.Request(url="https://google.com", callback=self.parse)
 
     def parse(self, response, **kwargs):
         self.logger.info("Starting parse Manga home page")
-        self.logger.info("request: {}".format(response.request.url))
-        self.logger.info("status code: {}".format(response.status))
-        f = open("response.html", "w")
-        f.write(response.text)
-        f.close()
+        # self.logger.info("request: {}".format(response.request.url))
+        # self.logger.info("status code: {}".format(response.status))
+        # f = open("response.html", "w")
+        # f.write(response.text)
+        # f.close()
+        url = "https://www.nettruyenup.com/truyen-tranh/imawa-no-kuni-no-alice"
+        chapter_data = open_selenium(url)
+        for chapter in reversed(chapter_data):
+            self.logger.info("Yield chapter: {}".format(chapter.get("name")))
+            if not chapter.get("image_urls"):
+                continue
+            item = MangaScrapItem()
+            item['name'] = chapter.get("name")
+            item['file_urls'] = chapter.get("file_urls")
+            item['referer'] = url
+            yield item

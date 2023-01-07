@@ -121,9 +121,13 @@ def open_selenium(url):
             return chapter_data_list
 
         # Reverse the list, first chapter is in the end
+        count = 0
         for chapter_item in reversed(chapter_data_list):
             logger.info("Loading {}".format(chapter_item.get("name")))
             href = chapter_item.get("href") or ''
+            count += 1
+            if count > 5:
+                break
             if not href:
                 logger.warning("--{} not loaded due to invalid href: {}".format(chapter_item.get("name"),
                                                                                 chapter_item.get("href")))
@@ -138,7 +142,7 @@ def open_selenium(url):
                     if imgs:
                         image_url = imgs[0].get_attribute("src") or ''
                         chapter_item.get('image_urls').append(image_url)
-            logger.info("number of images: {}".format(chapter_item.get('image_urls')))
+            logger.info("number of images: {}".format(len(chapter_item.get('image_urls'))))
     except Exception as e:
         logger.error("Error: ")
         logger.error(e)

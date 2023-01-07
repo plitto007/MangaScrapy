@@ -64,11 +64,12 @@ DOWNLOADER_MIDDLEWARES = {
 
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
-# ITEM_PIPELINES = {
-#    'manga_scrap.pipelines.MangaScrapPipeline': 300,
-# }
-ITEM_PIPELINES = {'manga_scrap.pipelines.NetTruyenImagesPipeline': 1}
-
+ITEM_PIPELINES = {
+    # 'manga_scrap.pipelines.MangaScrapPipeline': 300
+    'manga_scrap.pipelines.NetTruyenImagesPipeline': 1
+}
+# ITEM_PIPELINES = {'scrapy.pipelines.files.FilesPipeline': 1}
+FILES_STORE = 'downloaded'
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://docs.scrapy.org/en/latest/topics/autothrottle.html
 # AUTOTHROTTLE_ENABLED = True
@@ -93,3 +94,6 @@ ITEM_PIPELINES = {'manga_scrap.pipelines.NetTruyenImagesPipeline': 1}
 # Set settings whose default value is deprecated to a future-proof value
 REQUEST_FINGERPRINTER_IMPLEMENTATION = '2.7'
 TWISTED_REACTOR = 'twisted.internet.asyncioreactor.AsyncioSelectorReactor'
+
+
+IMAGES_STORE = '/'
