@@ -43,20 +43,22 @@ def create_driver():
     return driver
 
 
-def create_chapter_item(name, url):
+def create_chapter_item(name, url, manga_name):
     """
     Create chapter_item
     """
     result = {
+        "manga_name": manga_name,
         "name": name,
         "href": url,
-        "image_urls": []
+        "image_urls": [],
+        "is_last": False
     }
 
     return result
 
 
-def open_selenium(url):
+def open_selenium(url, manga_name):
     """
     Return chapter data list
 
@@ -65,6 +67,7 @@ def open_selenium(url):
 
     result = [{
         "name": name,
+        "manga_name":"Alice in borderland"
         "href": url,
         "image_urls": ["https://u.ntcdntempv3.com/cont...."]
     }]
@@ -105,7 +108,7 @@ def open_selenium(url):
                                 chapter_name = chapter_link_element.text
                                 # logger.info("{}: {}".format(chapter_link_element.text, href))
                                 logger.info("{}: {}".format(chapter_name, href))
-                                chapter_data_list.append(create_chapter_item(chapter_name, href))
+                                chapter_data_list.append(create_chapter_item(chapter_name, href, manga_name))
 
                 else:
                     logger.error("Not found any chapter")
@@ -121,13 +124,11 @@ def open_selenium(url):
             return chapter_data_list
 
         # Reverse the list, first chapter is in the end
-        count = 0
-        for chapter_item in reversed(chapter_data_list):
+        for index, chapter_item in enumerate(reversed(chapter_data_list)):
             logger.info("Loading {}".format(chapter_item.get("name")))
             href = chapter_item.get("href") or ''
-            count += 1
-            if count > 5:
-                break
+            if index == len(chapter_data_list) - 1:
+                chapter_item['is_last'] = True
             if not href:
                 logger.warning("--{} not loaded due to invalid href: {}".format(chapter_item.get("name"),
                                                                                 chapter_item.get("href")))

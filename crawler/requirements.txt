@@ -8,3 +8,4 @@ selenium==4.7.2
 Pillow==9.4.0
 chromedriver-binary==104.0.5112.79.0
 selenium-stealth==1.0.6
+fpdf==1.7.2

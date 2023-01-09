@@ -114,10 +114,10 @@ class CloudFlareMiddleware:
         """Test if the given response contains the cloudflare's anti-bot protection"""
 
         return (
-                (response.status == 503 or response.status == 403)
-                # and response.headers.get('Server', '').startswith(b'cloudflare')
-                # and 'jschl_vc' in response.text
-                # and 'jschl_answer' in response.text
+            (response.status == 503 or response.status == 403)
+            # and response.headers.get('Server', '').startswith(b'cloudflare')
+            # and 'jschl_vc' in response.text
+            # and 'jschl_answer' in response.text
         )
 
     def process_response(self, request, response, spider):
