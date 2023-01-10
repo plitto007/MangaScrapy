@@ -1,3 +1,5 @@
+import os
+
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.keys import Keys
@@ -5,12 +7,17 @@ from selenium.webdriver.common.by import By
 import urllib.request
 import logging
 import json
+from fpdf import FPDF
+from PIL import Image
+from functools import cmp_to_key
+from PyPDF2 import PdfMerger
 
 logger = logging.getLogger('selenium')
 logger.setLevel(logging.DEBUG)
 fh = logging.FileHandler('selenium.log')
 fh.setLevel(logging.INFO)
 logger.addHandler(fh)
+dir_path = os.path.dirname(os.path.realpath(__file__))
 
 
 def create_driver():
@@ -22,7 +29,7 @@ def create_driver():
     options.add_argument("--disable-popup-blocking")
     options.add_argument("--disable-javascript")
     options.add_argument("--no-sandbox")
-    options.add_argument("--disable-dev-shm-usage") # overcome limited  resource   problems
+    options.add_argument("--disable-dev-shm-usage")  # overcome limited  resource   problems
     driver = webdriver.Chrome(options=options)
     return driver
 
@@ -130,5 +137,78 @@ def open_selenium(url='https://www.nettruyenup.com/truyen-tranh/imawa-no-kuni-no
     return chapter_data_list
 
 
+def convert_2_pdf(manga_name="Alice in borderland"):
+    """
+    Convert  images downloaded to pdf
+    """
+    print("***********CONVERT 2 PDF******************")
+    try:
+
+        download_folder = dir_path + "/downloaded/" + manga_name
+        print('downloaded folder: {}'.format(download_folder))
+        # iterating each chapter folder
+        # Rename the chapter files
+        # for chapter_path in entries:
+        #     print('chapter path {}'.format(chapter_path))
+        #     chapter_path_items = chapter_path.split(" ")
+        #     if len(chapter_path_items) > 1:
+        #         os.rename(download_folder + "/" + chapter_path, download_folder + "/" + chapter_path_items[1])
+        # entries = sorted(os.listdir(download_folder))
+        print('list dir: {}'.format(os.listdir(download_folder)))
+
+        def compare(a, b):
+            float_a = float(a)
+            float_b = float(b)
+            if float_a < float_b:
+                return -1
+            if float_a > float_b:
+                return 1
+            return 0
+
+        list_dir = os.listdir(download_folder)
+        entries = sorted(list_dir, key=cmp_to_key(compare))
+        pdf_images = []
+        for chapter_path in entries:
+            print('chapter path {}'.format(chapter_path))
+            pdf = FPDF(format="letter")
+            if os.path.isdir(download_folder + "/" + chapter_path):
+                chapter_files_path = sorted(os.listdir(download_folder + "/" + chapter_path))
+                for chapter_img in chapter_files_path:
+                    # pdf.add_page()
+                    #
+                    # pdf.image(download_folder + "/" + chapter_path + '/' + chapter_img)
+                    imageFile = download_folder + "/" + chapter_path + '/' + chapter_img
+                    cover = Image.open(imageFile)
+                    width, height = cover.size
+
+                    # convert pixel in mm with 1px=0.264583 mm
+                    width, height = float(width * 0.264583), float(height * 0.264583)
+
+                    # given we are working with A4 format size
+                    pdf_size = {'P': {'w': 210, 'h': 297}, 'L': {'w': 297, 'h': 210}}
+
+                    # get page orientation from image size
+                    orientation = 'P' if width < height else 'L'
+
+                    #  make sure image size is not greater than the pdf format size
+                    width = width if width < pdf_size[orientation]['w'] else pdf_size[orientation]['w']
+                    height = height if height < pdf_size[orientation]['h'] else pdf_size[orientation]['h']
+
+                    pdf.add_page(orientation=orientation)
+                    pdf.image(imageFile, w=width, h=height)
+            pdf.output("{}.pdf".format(chapter_path), "F")
+            pdf_images.append(chapter_path + ".pdf")
+        merger = PdfMerger()
+        for pdf in pdf_images:
+            merger.append(pdf)
+        merger.write("{}.pdf".format(manga_name))
+        merger.close()
+        print("DONE")
+    except Exception as e:
+        print("Error: ")
+        print(e)
+
+
 if __name__ == "__main__":
-    open_selenium()
+    # open_selenium()
+    convert_2_pdf()
